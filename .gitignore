@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Assessment documents are confidential — keep them out of the repository
+docs/

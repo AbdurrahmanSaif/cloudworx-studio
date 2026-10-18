@@ -1,75 +1,70 @@
-# React + TypeScript + Vite
+# Cloudworx Studio — 3D Industrial Layout Editor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small 3D layout editor built for the Cloudworx Frontend Developer (React) take-home assessment (Part B). Sales engineers place equipment on a fixed 20 m × 12 m floor grid, edit the layout, see live rule violations, and read a bill of materials — in English or Vietnamese.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19 + TypeScript + Vite**
+- **Three.js** via **React Three Fiber** and **Drei**
+- **Zustand** for editor state and undo/redo
+- **Tailwind CSS v4** for the interface
+- **Vitest** for focused unit tests
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Then open the printed local URL (default `http://localhost:5173`) in a modern browser (Chrome/Edge recommended).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Other scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Script              | Purpose                          |
+| ------------------- | -------------------------------- |
+| `npm run dev`       | Start dev server with HMR        |
+| `npm run build`     | Type-check and production build  |
+| `npm run preview`   | Preview the production build     |
+| `npm run lint`      | Run ESLint                       |
+| `npm test`          | Run unit tests once (Vitest)     |
+| `npm run test:watch`| Run unit tests in watch mode     |
 
-```
+## Features
+
+Status: **Milestone 2 complete** — data model, store, undo/redo, tests. Remaining milestones in progress.
+
+- [x] Project scaffold, Tailwind, Vitest, base layout regions
+- [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (53 unit tests)
+- [ ] Floor grid (20 m × 12 m, 0.5 m cells) and equipment palette (3+ types)
+- [ ] Place equipment with grid snapping; select, move, rotate, delete
+- [ ] Undo and redo for every edit
+- [ ] Placed-items list and properties panel with two-way selection sync
+- [ ] Live proximity rule (item centres < 0.6 m highlighted, both names shown)
+- [ ] Bill of materials table derived from the scene
+- [ ] English / Vietnamese language toggle
+- [ ] README with measured 500-item benchmark
+
+## Architecture Notes
+
+- **Single source of truth:** layout data (`LayoutItem[]` inside the store's undo/redo `History`) is the only place items exist. Three.js/R3F objects are pure renderers of that state — never application state.
+- **Immutable edits:** every store action returns new arrays/objects; tests assert previous history states are not mutated.
+- **Undo/redo:** snapshot-based (`src/store/history.ts`, pure + tested, capped at 100 entries). Continuous drags use a transform session (`beginTransform` → `previewItemPosition` → `endTransform`) so a whole drag becomes exactly one history entry; a click without movement creates none.
+- **Pure logic separated from UI:** grid snapping/bounds, the proximity rule, and history live in `src/lib/` and `src/store/history.ts` as pure functions with unit tests (`npm test`, 53 tests).
+- **Consistent placement:** every position change (add, drag, panel edit, rotation) goes through one entry point — snap to 0.5 m grid, then clamp the footprint inside the 20 × 12 m floor. Equipment footprints are defined in 1 m multiples so clamped positions always remain grid-aligned.
+- **Component boundaries:** `src/components/editor/` holds R3F scene components; `src/components/ui/` holds DOM panels; `src/lib/i18n.ts` will hold EN/VI strings.
+
+## Benchmark
+
+_To be added after Milestone 7 with measured numbers (hardware, browser, FPS at 500 items). No invented results._
+
+## Assumptions & Limitations
+
+- Equipment uses simple three.js primitives (no external glTF models) per assessment guidance to spend time on editor behaviour.
+- Proximity rule measures centre-to-centre distance **on the ground plane (x/z)**: items rest on the floor, so this keeps the rule independent of item height and consistent across equipment types. O(n²) pairwise check — fine at the assessed scale (hundreds of items); revisit if scenes grow to thousands.
+- Selection (which item is active) is transient UI state and is **not** part of undo history: undoing a delete restores the item but does not re-select it.
+- No backend, persistence, authentication, or collaboration (explicitly out of scope).
+
+## AI Tooling
+
+This project was built with the assistance of an AI coding agent (OpenCode, Claude model) for scaffolding, implementation, and checks, under the candidate's direction and review.

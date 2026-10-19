@@ -6,6 +6,7 @@ import { Scene } from './editor/Scene'
 import { ItemList } from './ui/ItemList'
 import { Palette } from './ui/Palette'
 import { PropertiesPanel } from './ui/PropertiesPanel'
+import { RuleWarnings } from './ui/RuleWarnings'
 import { Toolbar } from './ui/Toolbar'
 
 export function AppLayout() {
@@ -55,7 +56,7 @@ export function AppLayout() {
             <PropertiesPanel />
           </Section>
           <Section title="Rule warnings" grow>
-            Proximity rules (milestone 5)
+            <RuleWarnings />
           </Section>
           <Section title="Bill of materials" grow>
             BOM table (milestone 6)

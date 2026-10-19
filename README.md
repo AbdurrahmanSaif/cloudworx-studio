@@ -32,7 +32,7 @@ Then open the printed local URL (default `http://localhost:5173`) in a modern br
 
 ## Features
 
-Status: **Milestone 4 complete** — 3D viewport editing and synchronised panels. Remaining milestones in progress.
+Status: **Milestone 5 complete** — live proximity rule. Remaining milestones in progress.
 
 - [x] Project scaffold, Tailwind, Vitest, base layout regions
 - [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (56 unit tests)
@@ -40,7 +40,7 @@ Status: **Milestone 4 complete** — 3D viewport editing and synchronised panels
 - [x] Place equipment with grid snapping; select, move (drag), rotate (90°), delete
 - [x] Undo and redo for every edit (toolbar buttons; drags = one entry)
 - [x] Placed-items list and properties panel with two-way selection sync
-- [ ] Live proximity rule (item centres < 0.6 m highlighted, both names shown)
+- [x] Live proximity rule (item centres < 0.6 m highlighted red in 3D, both names shown in warnings panel)
 - [ ] Bill of materials table derived from the scene
 - [ ] English / Vietnamese language toggle
 - [ ] README with measured 500-item benchmark
@@ -53,6 +53,7 @@ Status: **Milestone 4 complete** — 3D viewport editing and synchronised panels
 - **Pure logic separated from UI:** grid snapping/bounds, the proximity rule, and history live in `src/lib/` and `src/store/history.ts` as pure functions with unit tests (`npm test`, 53 tests).
 - **Consistent placement:** every position change (add, drag, panel edit, rotation) goes through one entry point — snap to 0.5 m grid, then clamp the footprint inside the 20 × 12 m floor. Equipment footprints are defined in 1 m multiples so clamped positions always remain grid-aligned.
 - **Selection sync:** the list, properties panel, toolbar and 3D viewport all read/write the same `selectedId` in the store — selecting in any surface updates the others.
+- **Live rule:** violation detection runs as a memoised pure function over the item array on every layout change; the same violation ids drive the red 3D highlights, the red dots in the item list, and the warnings panel messages (both names + measured distance).
 - **Component boundaries:** `src/components/editor/` holds R3F scene components; `src/components/ui/` holds DOM panels; `src/lib/i18n.ts` will hold EN/VI strings.
 
 ## Benchmark

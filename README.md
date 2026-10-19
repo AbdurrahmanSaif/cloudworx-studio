@@ -1,6 +1,6 @@
 # Cloudworx Studio — 3D Industrial Layout Editor
 
-**Part B submission** for the Cloudworx Frontend Developer (React) technical assessment.
+<!-- **Part B submission** for the Cloudworx Frontend Developer (React) technical assessment. -->
 
 A small 3D layout editor: sales engineers place equipment on a fixed 20 m × 12 m floor grid, move, rotate and delete items with full undo/redo, see live proximity rule violations, and read a bill of materials — in English or Vietnamese.
 
@@ -46,15 +46,15 @@ _Dev only:_ the header also shows **Seed 500** / **Measure 5s** / live FPS contr
 
 ## Part B Requirements Coverage
 
-| # | Required (assessment §5)                                                                                                                | Where / status                                                                                    |
-| - | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 1 | Floor grid 20 m × 12 m with 0.5 m cells, palette of ≥ 3 item types (glTF with source, or primitives)                                     | `src/lib/grid.ts`, `src/lib/catalog.ts`, `Palette` — simple three.js primitives (no third-party models) ✅ |
-| 2 | Place from palette with grid snapping; select, move, rotate, delete                                                                      | `editorStore` + `Scene` (`InteractionPlane`, `DragController`) + toolbar/properties ✅               |
-| 3 | Undo and redo for every edit                                                                                                            | `src/store/history.ts` (snapshot, tested) + one-entry-per-drag transform sessions ✅               |
-| 4 | Placed-items list and properties panel, selection in sync both ways with the 3D view                                                     | shared `selectedId` in the store; `ItemList`, `PropertiesPanel`, 3D selection ✅                    |
-| 5 | Live rule: two items closer than 0.6 m highlighted, message naming both                                                                  | `src/lib/rules.ts` + red highlights in 3D + `RuleWarnings` (both names + distance) ✅               |
-| 6 | Bill of materials counted from the scene, English + Vietnamese toggle (machine-translated fine)                                          | `src/lib/bom.ts` + `BomTable`; `src/lib/i18n.ts` typed dictionaries + `LangToggle` ✅                |
-| 7 | README with run instructions and the frame rate measured with 500 items placed, and on what hardware                                     | This file — [Quick Start](#quick-start-run-it-locally) + [Benchmark](#benchmark-500-items-measured) ✅ |
+| #   | Required (assessment §5)                                                                             | Where / status                                                                                             |
+| --- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 1   | Floor grid 20 m × 12 m with 0.5 m cells, palette of ≥ 3 item types (glTF with source, or primitives) | `src/lib/grid.ts`, `src/lib/catalog.ts`, `Palette` — simple three.js primitives (no third-party models) ✅ |
+| 2   | Place from palette with grid snapping; select, move, rotate, delete                                  | `editorStore` + `Scene` (`InteractionPlane`, `DragController`) + toolbar/properties ✅                     |
+| 3   | Undo and redo for every edit                                                                         | `src/store/history.ts` (snapshot, tested) + one-entry-per-drag transform sessions ✅                       |
+| 4   | Placed-items list and properties panel, selection in sync both ways with the 3D view                 | shared `selectedId` in the store; `ItemList`, `PropertiesPanel`, 3D selection ✅                           |
+| 5   | Live rule: two items closer than 0.6 m highlighted, message naming both                              | `src/lib/rules.ts` + red highlights in 3D + `RuleWarnings` (both names + distance) ✅                      |
+| 6   | Bill of materials counted from the scene, English + Vietnamese toggle (machine-translated fine)      | `src/lib/bom.ts` + `BomTable`; `src/lib/i18n.ts` typed dictionaries + `LangToggle` ✅                      |
+| 7   | README with run instructions and the frame rate measured with 500 items placed, and on what hardware | This file — [Quick Start](#quick-start-run-it-locally) + [Benchmark](#benchmark-500-items-measured) ✅     |
 
 All required core items are implemented. No "plus" items were attempted — the assessment allows picking none, and depth was prioritised over breadth.
 
@@ -62,18 +62,18 @@ All required core items are implemented. No "plus" items were attempted — the 
 
 Measured with the dev-only header controls on **2026-10-19**, app in its normal editing state (all panels visible; the proximity rule evaluating 124,750 item pairs per layout change):
 
-| Field                      | Value                                                            |
-| -------------------------- | ---------------------------------------------------------------- |
-| Items                      | 500 (mixed cabinet/motor/conveyor, random 90° rotations)         |
-| **Average FPS (5 s)**      | **75.3**                                                         |
-| Min / max FPS (1 s window) | 75.7 / 76.7                                                      |
-| Draw calls                 | 1,002                                                            |
-| Triangles                  | 67,950                                                           |
-| Browser                    | Chrome 155.0.0.0 (Windows)                                       |
-| GPU                        | Intel Iris Xe Graphics — ANGLE (Direct3D 11)                     |
-| CPU cores                  | 8                                                                |
-| Device pixel ratio         | 1.25                                                             |
-| Measured at                | 2026-10-19T12:17:43Z                                             |
+| Field                      | Value                                                    |
+| -------------------------- | -------------------------------------------------------- |
+| Items                      | 500 (mixed cabinet/motor/conveyor, random 90° rotations) |
+| **Average FPS (5 s)**      | **75.3**                                                 |
+| Min / max FPS (1 s window) | 75.7 / 76.7                                              |
+| Draw calls                 | 1,002                                                    |
+| Triangles                  | 67,950                                                   |
+| Browser                    | Chrome 155.0.0.0 (Windows)                               |
+| GPU                        | Intel Iris Xe Graphics — ANGLE (Direct3D 11)             |
+| CPU cores                  | 8                                                        |
+| Device pixel ratio         | 1.25                                                     |
+| Measured at                | 2026-10-19T12:17:43Z                                     |
 
 **Reproduce (~1 minute):**
 
@@ -111,7 +111,7 @@ The benchmark budget in the scenario is 50+ fps at 1080p on integrated graphics 
 Stated as required by the assessment ("say in your README which tools you used and how"):
 
 - **Tool:** [OpenCode](https://opencode.ai) — an AI coding agent in the terminal with file edit/search and shell access (Claude models for the early milestones; `opencode/mimo-v2.6-flash-free` for the final ones).
-- **How, in one loop per milestone:** the candidate scoped each of the 7 milestones in short prompts (e.g. *"add the proximity rule with tests"*, *"migrate panels to i18n"*, *"commit and move to the next step"*). The agent then researched the relevant code, implemented the change, and ran the full gate set (`tsc -b`, `eslint`, `vitest`, `build`) before reporting back; commits happened only on the candidate's request, with the candidate reviewing the diff.
+- **How, in one loop per milestone:** the candidate scoped each of the 7 milestones in short prompts (e.g. _"add the proximity rule with tests"_, _"migrate panels to i18n"_, _"commit and move to the next step"_). The agent then researched the relevant code, implemented the change, and ran the full gate set (`tsc -b`, `eslint`, `vitest`, `build`) before reporting back; commits happened only on the candidate's request, with the candidate reviewing the diff.
 - **Division of responsibility:** the agent wrote the code and tests; the candidate directed design decisions (e.g. snapshot vs. command undo, drag-as-one-entry, EN/VI strategy), performed **all** manual browser testing, and ran the benchmark on their own hardware — the measured numbers in this README come from that run, not from the agent.
 - **Review readiness:** every part of this codebase can be walked through in the design review, including the prompts behind each milestone.
 

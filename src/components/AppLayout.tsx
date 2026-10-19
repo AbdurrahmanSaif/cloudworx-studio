@@ -1,31 +1,57 @@
+import { useEffect } from 'react'
+import type { ReactNode } from 'react'
+import { editorStore, useEditorStore } from '../store/editorStore'
+import { Scene } from './editor/Scene'
+import { ItemList } from './ui/ItemList'
+import { Palette } from './ui/Palette'
+import { PropertiesPanel } from './ui/PropertiesPanel'
+import { Toolbar } from './ui/Toolbar'
+
 export function AppLayout() {
+  const placingType = useEditorStore((s) => s.placingType)
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      const s = editorStore.getState()
+      if (s.placingType !== null) s.setPlacingType(null)
+      else s.select(null)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-zinc-800 bg-zinc-900 px-4">
-        <span className="text-sm font-semibold tracking-wide text-zinc-100">
+      <header className="flex h-12 shrink-0 items-center gap-4 border-b border-zinc-800 bg-zinc-900 px-3">
+        <span className="shrink-0 text-sm font-semibold tracking-wide text-zinc-100">
           Cloudworx Studio
         </span>
-        <div className="ml-auto flex items-center gap-2 text-xs text-zinc-500">
-          Toolbar (milestone 3)
-        </div>
+        <Toolbar />
       </header>
 
       <div className="flex min-h-0 flex-1">
         <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900/60">
-          <Section title="Palette">Equipment palette (milestone 3)</Section>
+          <Section title="Palette">
+            <Palette />
+          </Section>
           <Section title="Placed items" grow>
-            Item list (milestone 4)
+            <ItemList />
           </Section>
         </aside>
 
-        <main className="relative min-w-0 flex-1 bg-zinc-950">
-          <div className="absolute inset-0 grid place-items-center text-sm text-zinc-600">
-            3D viewport (milestone 3)
-          </div>
+        <main
+          className={`relative min-w-0 flex-1 bg-zinc-950 ${
+            placingType !== null ? 'cursor-crosshair' : ''
+          }`}
+        >
+          <Scene />
         </main>
 
         <aside className="flex w-80 shrink-0 flex-col border-l border-zinc-800 bg-zinc-900/60">
-          <Section title="Properties">Properties panel (milestone 4)</Section>
+          <Section title="Properties">
+            <PropertiesPanel />
+          </Section>
           <Section title="Rule warnings" grow>
             Proximity rules (milestone 5)
           </Section>
@@ -45,7 +71,7 @@ function Section({
 }: {
   title: string
   grow?: boolean
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <section

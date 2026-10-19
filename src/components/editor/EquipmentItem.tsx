@@ -22,9 +22,14 @@ const GEOMETRIES: Record<ItemType, BufferGeometry> = {
 interface EquipmentItemProps {
   item: LayoutItem
   selected: boolean
+  violated: boolean
 }
 
-export function EquipmentItem({ item, selected }: EquipmentItemProps) {
+export function EquipmentItem({
+  item,
+  selected,
+  violated,
+}: EquipmentItemProps) {
   const def = EQUIPMENT[item.type]
   const ringRadius =
     Math.max(def.footprint.width, def.footprint.depth) / 2 + 0.2
@@ -53,17 +58,17 @@ export function EquipmentItem({ item, selected }: EquipmentItemProps) {
         onPointerDown={handlePointerDown}
       >
         <meshStandardMaterial
-          color={selected ? '#fbbf24' : def.color}
-          emissive={selected ? '#f59e0b' : '#000000'}
-          emissiveIntensity={selected ? 0.5 : 0}
+          color={violated ? '#ef4444' : selected ? '#fbbf24' : def.color}
+          emissive={violated ? '#dc2626' : selected ? '#f59e0b' : '#000000'}
+          emissiveIntensity={violated ? 0.55 : selected ? 0.5 : 0}
           roughness={0.6}
           metalness={0.15}
         />
       </mesh>
-      {selected && (
+      {(selected || violated) && (
         <mesh rotation-x={-Math.PI / 2} position-y={0.02}>
           <ringGeometry args={[ringRadius - 0.08, ringRadius, 48]} />
-          <meshBasicMaterial color="#fbbf24" />
+          <meshBasicMaterial color={violated ? '#ef4444' : '#fbbf24'} />
         </mesh>
       )}
     </group>

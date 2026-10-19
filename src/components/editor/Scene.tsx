@@ -1,8 +1,9 @@
 import { OrbitControls } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Plane, Raycaster, Vector2, Vector3 } from 'three'
 import { FLOOR } from '../../lib/grid'
+import { collectViolationIds, findProximityViolations } from '../../lib/rules'
 import {
   editorStore,
   selectItems,
@@ -38,6 +39,10 @@ function InteractionPlane() {
 function ItemsLayer() {
   const items = useEditorStore(selectItems)
   const selectedId = useEditorStore(selectSelectedId)
+  const violatedIds = useMemo(
+    () => collectViolationIds(findProximityViolations(items)),
+    [items],
+  )
   return (
     <>
       {items.map((item) => (
@@ -45,6 +50,7 @@ function ItemsLayer() {
           key={item.id}
           item={item}
           selected={item.id === selectedId}
+          violated={violatedIds.has(item.id)}
         />
       ))}
     </>

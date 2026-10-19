@@ -32,14 +32,14 @@ Then open the printed local URL (default `http://localhost:5173`) in a modern br
 
 ## Features
 
-Status: **Milestone 2 complete** — data model, store, undo/redo, tests. Remaining milestones in progress.
+Status: **Milestone 4 complete** — 3D viewport editing and synchronised panels. Remaining milestones in progress.
 
 - [x] Project scaffold, Tailwind, Vitest, base layout regions
-- [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (53 unit tests)
-- [ ] Floor grid (20 m × 12 m, 0.5 m cells) and equipment palette (3+ types)
-- [ ] Place equipment with grid snapping; select, move, rotate, delete
-- [ ] Undo and redo for every edit
-- [ ] Placed-items list and properties panel with two-way selection sync
+- [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (56 unit tests)
+- [x] Floor grid (20 m × 12 m, 0.5 m cells) and equipment palette (3 types: cabinet, motor, conveyor)
+- [x] Place equipment with grid snapping; select, move (drag), rotate (90°), delete
+- [x] Undo and redo for every edit (toolbar buttons; drags = one entry)
+- [x] Placed-items list and properties panel with two-way selection sync
 - [ ] Live proximity rule (item centres < 0.6 m highlighted, both names shown)
 - [ ] Bill of materials table derived from the scene
 - [ ] English / Vietnamese language toggle
@@ -52,6 +52,7 @@ Status: **Milestone 2 complete** — data model, store, undo/redo, tests. Remain
 - **Undo/redo:** snapshot-based (`src/store/history.ts`, pure + tested, capped at 100 entries). Continuous drags use a transform session (`beginTransform` → `previewItemPosition` → `endTransform`) so a whole drag becomes exactly one history entry; a click without movement creates none.
 - **Pure logic separated from UI:** grid snapping/bounds, the proximity rule, and history live in `src/lib/` and `src/store/history.ts` as pure functions with unit tests (`npm test`, 53 tests).
 - **Consistent placement:** every position change (add, drag, panel edit, rotation) goes through one entry point — snap to 0.5 m grid, then clamp the footprint inside the 20 × 12 m floor. Equipment footprints are defined in 1 m multiples so clamped positions always remain grid-aligned.
+- **Selection sync:** the list, properties panel, toolbar and 3D viewport all read/write the same `selectedId` in the store — selecting in any surface updates the others.
 - **Component boundaries:** `src/components/editor/` holds R3F scene components; `src/components/ui/` holds DOM panels; `src/lib/i18n.ts` will hold EN/VI strings.
 
 ## Benchmark

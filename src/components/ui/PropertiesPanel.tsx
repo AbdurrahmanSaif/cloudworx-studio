@@ -1,3 +1,4 @@
+import { RotateCw, Trash2 } from 'lucide-react'
 import type { FocusEvent, ReactNode } from 'react'
 import { EQUIPMENT } from '../../lib/catalog'
 import { itemDisplayName, typeLabel } from '../../lib/labels'
@@ -65,15 +66,17 @@ function PropertiesForm({ item }: { item: LayoutItem }) {
         <button
           type="button"
           onClick={() => rotateItem(item.id)}
-          className="flex-1 rounded border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-zinc-200 transition-colors hover:border-zinc-500 hover:bg-zinc-700"
+          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-zinc-200 transition-colors hover:border-zinc-500 hover:bg-zinc-700"
         >
+          <RotateCw className="h-3.5 w-3.5" aria-hidden="true" />
           Rotate 90°
         </button>
         <button
           type="button"
           onClick={() => deleteItem(item.id)}
-          className="flex-1 rounded border border-red-900/60 bg-red-950/60 px-2.5 py-1.5 text-red-300 transition-colors hover:border-red-700 hover:bg-red-900/40"
+          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-red-900/60 bg-red-950/60 px-2.5 py-1.5 text-red-300 transition-colors hover:border-red-700 hover:bg-red-900/40"
         >
+          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
           Delete
         </button>
       </div>

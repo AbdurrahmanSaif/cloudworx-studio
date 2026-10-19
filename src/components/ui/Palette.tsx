@@ -1,6 +1,15 @@
+import { Archive, Cog, MoveHorizontal } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { EQUIPMENT, ITEM_TYPES } from '../../lib/catalog'
 import { typeLabel } from '../../lib/labels'
+import type { ItemType } from '../../types'
 import { useEditorStore } from '../../store/editorStore'
+
+const TYPE_ICONS: Record<ItemType, LucideIcon> = {
+  cabinet: Archive,
+  motor: Cog,
+  conveyor: MoveHorizontal,
+}
 
 export function Palette() {
   const placingType = useEditorStore((s) => s.placingType)
@@ -11,10 +20,12 @@ export function Palette() {
       {ITEM_TYPES.map((type) => {
         const active = placingType === type
         const def = EQUIPMENT[type]
+        const Icon = TYPE_ICONS[type]
         return (
           <button
             key={type}
             type="button"
+            aria-pressed={active}
             onClick={() => setPlacingType(active ? null : type)}
             className={`flex items-center gap-2 rounded-md border px-2.5 py-2 text-left text-xs transition-colors ${
               active
@@ -22,10 +33,10 @@ export function Palette() {
                 : 'border-zinc-700 bg-zinc-800/40 text-zinc-300 hover:border-zinc-500'
             }`}
           >
-            <span
+            <Icon
               aria-hidden="true"
-              className="inline-block h-3 w-3 rounded-sm"
-              style={{ backgroundColor: def.color }}
+              className="h-3.5 w-3.5 shrink-0"
+              style={{ color: def.color }}
             />
             <span className="font-medium">{typeLabel(type)}</span>
             <span className="ml-auto text-[10px] text-zinc-500">

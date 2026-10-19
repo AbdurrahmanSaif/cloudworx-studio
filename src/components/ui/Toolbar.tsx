@@ -1,3 +1,4 @@
+import { Redo2, RotateCw, Trash2, Undo2 } from 'lucide-react'
 import { typeLabel } from '../../lib/labels'
 import {
   selectCanRedo,
@@ -7,7 +8,7 @@ import {
 } from '../../store/editorStore'
 
 const BTN =
-  'rounded border px-2.5 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40'
+  'inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40'
 const NEUTRAL =
   'border-zinc-700 bg-zinc-800 text-zinc-200 hover:border-zinc-500 enabled:hover:bg-zinc-700'
 const DANGER =
@@ -34,6 +35,7 @@ export function Toolbar() {
         disabled={!canUndo}
         onClick={undo}
       >
+        <Undo2 className="h-3.5 w-3.5" aria-hidden="true" />
         Undo
       </button>
       <button
@@ -42,6 +44,7 @@ export function Toolbar() {
         disabled={!canRedo}
         onClick={redo}
       >
+        <Redo2 className="h-3.5 w-3.5" aria-hidden="true" />
         Redo
       </button>
       <span aria-hidden="true" className="mx-1 h-5 w-px bg-zinc-700" />
@@ -51,6 +54,7 @@ export function Toolbar() {
         disabled={!hasSelection}
         onClick={() => selectedId && rotateItem(selectedId)}
       >
+        <RotateCw className="h-3.5 w-3.5" aria-hidden="true" />
         Rotate 90°
       </button>
       <button
@@ -59,6 +63,7 @@ export function Toolbar() {
         disabled={!hasSelection}
         onClick={() => selectedId && deleteItem(selectedId)}
       >
+        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
         Delete
       </button>
       <div className="ml-auto flex items-center gap-3 text-xs text-zinc-500">

@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import { EQUIPMENT } from '../../lib/catalog'
 import { itemDisplayName } from '../../lib/labels'
 import {
@@ -51,9 +52,9 @@ export function ItemList() {
               type="button"
               aria-label={`Delete ${name}`}
               onClick={() => deleteItem(item.id)}
-              className="shrink-0 rounded border border-transparent px-1.5 py-1 text-zinc-600 transition-colors hover:border-red-900/60 hover:bg-red-950/60 hover:text-red-300"
+              className="shrink-0 rounded border border-transparent p-1 text-zinc-600 transition-colors hover:border-red-900/60 hover:bg-red-950/60 hover:text-red-300"
             >
-              ×
+              <X className="h-3 w-3" aria-hidden="true" />
             </button>
           </li>
         )

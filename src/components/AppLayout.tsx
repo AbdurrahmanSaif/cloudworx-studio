@@ -1,3 +1,4 @@
+import { Boxes } from 'lucide-react'
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { editorStore, useEditorStore } from '../store/editorStore'
@@ -24,7 +25,8 @@ export function AppLayout() {
   return (
     <div className="flex h-full flex-col">
       <header className="flex h-12 shrink-0 items-center gap-4 border-b border-zinc-800 bg-zinc-900 px-3">
-        <span className="shrink-0 text-sm font-semibold tracking-wide text-zinc-100">
+        <span className="flex shrink-0 items-center gap-2 text-sm font-semibold tracking-wide text-zinc-100">
+          <Boxes className="h-4 w-4 text-amber-500" aria-hidden="true" />
           Cloudworx Studio
         </span>
         <Toolbar />

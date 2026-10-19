@@ -28,3 +28,10 @@ export interface LayoutItem {
   /** Rotation around the Y axis in degrees (multiples of 90). */
   rotation: number
 }
+
+/** Raw placement input for batch seeding (ids and sequence numbers assigned by the store). */
+export interface SeedEntry {
+  type: ItemType
+  position: Vec2
+  rotation?: number
+}

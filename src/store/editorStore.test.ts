@@ -199,6 +199,59 @@ describe('placing mode', () => {
   })
 })
 
+describe('seedItems', () => {
+  it('creates every item in a single history entry', () => {
+    state().seedItems([
+      { type: 'cabinet', position: { x: 0, z: 0 } },
+      { type: 'motor', position: { x: 4, z: 0 } },
+      { type: 'conveyor', position: { x: -4, z: 2 } },
+    ])
+    expect(items()).toHaveLength(3)
+    expect(state().history.past).toHaveLength(1)
+    expect(state().selectedId).toBeNull()
+    expect(state().transformId).toBeNull()
+    state().undo()
+    expect(items()).toHaveLength(0)
+  })
+
+  it('continues per-type sequence numbers from existing items', () => {
+    state().addItem('cabinet', { x: 0, z: 0 })
+    state().seedItems([
+      { type: 'cabinet', position: { x: 4, z: 0 } },
+      { type: 'cabinet', position: { x: 8, z: 0 } },
+    ])
+    expect(items().map((i) => i.seq)).toEqual([1, 2, 3])
+  })
+
+  it('resolves every entry onto the grid and inside the floor', () => {
+    state().seedItems([
+      { type: 'cabinet', position: { x: 1.3, z: 2.4 } },
+      { type: 'motor', position: { x: 500, z: -500 } },
+      { type: 'conveyor', position: { x: -9.9, z: 5.9 }, rotation: 90 },
+    ])
+    for (const item of items()) {
+      expect(isOnGrid(item.position.x)).toBe(true)
+      expect(isOnGrid(item.position.z)).toBe(true)
+      expect(Math.abs(item.position.x)).toBeLessThanOrEqual(9.5)
+      expect(Math.abs(item.position.z)).toBeLessThanOrEqual(5.5)
+    }
+    expect(items()[0].position).toEqual({ x: 1.5, z: 2.5 })
+    expect(items()[2].rotation).toBe(90)
+  })
+
+  it('ignores empty input and input during a transform', () => {
+    state().seedItems([])
+    expect(items()).toHaveLength(0)
+    expect(state().history.past).toHaveLength(0)
+
+    state().addItem('cabinet', { x: 0, z: 0 })
+    state().beginTransform(items()[0].id)
+    state().seedItems([{ type: 'motor', position: { x: 4, z: 0 } }])
+    expect(items()).toHaveLength(1)
+    state().endTransform()
+  })
+})
+
 describe('undo / redo', () => {
   it('walks add, delete and rotate edits backwards and forwards', () => {
     state().addItem('cabinet', { x: 0, z: 0 })

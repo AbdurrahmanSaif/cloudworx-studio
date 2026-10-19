@@ -32,10 +32,10 @@ Then open the printed local URL (default `http://localhost:5173`) in a modern br
 
 ## Features
 
-Status: **Milestone 6 complete** — bill of materials and language toggle. Only the benchmark milestone remains.
+Status: **Milestone 7 in progress** — benchmark harness built; the measured numbers below await one run on the reviewer's machine.
 
 - [x] Project scaffold, Tailwind, Vitest, base layout regions
-- [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (67 unit tests)
+- [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (76 unit tests)
 - [x] Floor grid (20 m × 12 m, 0.5 m cells) and equipment palette (3 types: cabinet, motor, conveyor)
 - [x] Place equipment with grid snapping; select, move (drag), rotate (90°), delete
 - [x] Undo and redo for every edit (toolbar buttons; drags = one entry)
@@ -50,16 +50,38 @@ Status: **Milestone 6 complete** — bill of materials and language toggle. Only
 - **Single source of truth:** layout data (`LayoutItem[]` inside the store's undo/redo `History`) is the only place items exist. Three.js/R3F objects are pure renderers of that state — never application state.
 - **Immutable edits:** every store action returns new arrays/objects; tests assert previous history states are not mutated.
 - **Undo/redo:** snapshot-based (`src/store/history.ts`, pure + tested, capped at 100 entries). Continuous drags use a transform session (`beginTransform` → `previewItemPosition` → `endTransform`) so a whole drag becomes exactly one history entry; a click without movement creates none.
-- **Pure logic separated from UI:** grid snapping/bounds, the proximity rule, and history live in `src/lib/` and `src/store/history.ts` as pure functions with unit tests (`npm test`, 53 tests).
+- **Pure logic separated from UI:** grid snapping/bounds, the proximity rule, and history live in `src/lib/` and `src/store/history.ts` as pure functions with unit tests (`npm test`, 76 tests).
 - **Consistent placement:** every position change (add, drag, panel edit, rotation) goes through one entry point — snap to 0.5 m grid, then clamp the footprint inside the 20 × 12 m floor. Equipment footprints are defined in 1 m multiples so clamped positions always remain grid-aligned.
 - **Selection sync:** the list, properties panel, toolbar and 3D viewport all read/write the same `selectedId` in the store — selecting in any surface updates the others.
 - **Live rule:** violation detection runs as a memoised pure function over the item array on every layout change; the same violation ids drive the red 3D highlights, the red dots in the item list, and the warnings panel messages (both names + measured distance).
 - **Localisation:** English and Vietnamese live in one typed dictionary (`src/lib/i18n.ts`) — the Vietnamese record must cover every English key or TypeScript fails. The store holds the current `lang`; components get a bound translator via `useI18n()`. Equipment names in lists, warnings and the BOM are localised through the same keys.
-- **Component boundaries:** `src/components/editor/` holds R3F scene components; `src/components/ui/` holds DOM panels; `src/lib/i18n.ts` will hold EN/VI strings.
+- **Component boundaries:** `src/components/editor/` holds R3F scene components; `src/components/ui/` holds DOM panels; `src/lib/i18n.ts` holds the EN/VI dictionaries; `src/dev/` holds dev-only benchmark tooling (seed generator, FPS sampler, hardware detection) that never renders in production builds.
 
 ## Benchmark
 
-_To be added after Milestone 7 with measured numbers (hardware, browser, FPS at 500 items). No invented results._
+Measured with the dev-only controls in the header (**Seed 500** / **Measure 5s** / live FPS readout):
+
+1. `npm run dev` and open the app.
+2. Reload for a fresh scene, then click **Seed 500** — 500 mixed items (cabinet/motor/conveyor, random 90° rotations) are placed as **one** history entry; a single **Undo** clears them all.
+3. Click **Measure 5s** — FPS is sampled from `requestAnimationFrame` deltas for five seconds.
+4. The header shows the summary (avg/min FPS, item count, draw calls); the full JSON report is printed to the DevTools console.
+
+### Measured result
+
+| Field | Value |
+| --- | --- |
+| Items | 500 |
+| Average FPS (5 s) | _pending — run the steps above_ |
+| Minimum FPS (1 s window) | _pending — run the steps above_ |
+| Draw calls | _pending — run the steps above_ |
+| Triangles | _pending — run the steps above_ |
+| Browser | _pending — run the steps above_ |
+| GPU (WebGL renderer string) | _pending — run the steps above_ |
+| CPU cores | _pending — run the steps above_ |
+| Device pixel ratio | _pending — run the steps above_ |
+| Measured at | _pending — run the steps above_ |
+
+Notes: numbers are browser-reported frame deltas (not a profiler); expect variance with power state and background load. The seeded scene is deliberately dense (roughly half the floor occupied, many sub-0.6 m pairs) so it stresses rendering, the O(n²) proximity check, the item list, and the warnings panel at once. The benchmark controls exist only in development builds (`import.meta.env.DEV`).
 
 ## Assumptions & Limitations
 

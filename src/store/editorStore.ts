@@ -1,6 +1,6 @@
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
-import type { ItemType, Lang, LayoutItem, Vec2 } from '../types'
+import type { ItemType, Lang, LayoutItem, SeedEntry, Vec2 } from '../types'
 import { EQUIPMENT } from '../lib/catalog'
 import {
   clampToFloor,
@@ -40,6 +40,8 @@ export interface EditorState {
   lang: Lang
 
   addItem: (type: ItemType, raw: Vec2) => void
+  /** Batch placement used by the benchmark: one history entry for all entries. */
+  seedItems: (entries: readonly SeedEntry[]) => void
   deleteItem: (id: string) => void
   rotateItem: (id: string) => void
   translateItem: (id: string, raw: Vec2) => void
@@ -77,6 +79,32 @@ export function createEditorStore() {
           history: pushHistory(s.history, [...s.history.present, item]),
           nextSeq: { ...s.nextSeq, [type]: seq + 1 },
           selectedId: item.id,
+        }
+      }),
+
+    seedItems: (entries) =>
+      set((s) => {
+        if (s.transformId !== null || entries.length === 0) return {}
+        const nextSeq = { ...s.nextSeq }
+        const created: LayoutItem[] = entries.map((e) => {
+          const seq = nextSeq[e.type]
+          nextSeq[e.type] = seq + 1
+          const rotation = e.rotation ?? 0
+          const footprint = rotatedFootprint(
+            EQUIPMENT[e.type].footprint,
+            rotation,
+          )
+          return {
+            id: createId(),
+            type: e.type,
+            seq,
+            position: resolvePlacement(e.position, footprint),
+            rotation,
+          }
+        })
+        return {
+          history: pushHistory(s.history, [...s.history.present, ...created]),
+          nextSeq,
         }
       }),
 

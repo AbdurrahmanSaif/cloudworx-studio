@@ -108,6 +108,22 @@ function DragController() {
   return null
 }
 
+/** Dev-only: exposes renderer statistics for the benchmark report. */
+function RenderInfoBridge() {
+  const gl = useThree((s) => s.gl)
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    window.__cwxRenderInfo = () => ({
+      drawCalls: gl.info.render.calls,
+      triangles: gl.info.render.triangles,
+    })
+    return () => {
+      delete window.__cwxRenderInfo
+    }
+  }, [gl])
+  return null
+}
+
 export function Scene() {
   const transformId = useEditorStore((s) => s.transformId)
 
@@ -127,6 +143,7 @@ export function Scene() {
       <InteractionPlane />
       <ItemsLayer />
       <DragController />
+      <RenderInfoBridge />
       <OrbitControls
         makeDefault
         enabled={transformId === null}

@@ -1,6 +1,6 @@
 import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
-import type { ItemType, LayoutItem, Vec2 } from '../types'
+import type { ItemType, Lang, LayoutItem, Vec2 } from '../types'
 import { EQUIPMENT } from '../lib/catalog'
 import {
   clampToFloor,
@@ -36,6 +36,8 @@ export interface EditorState {
   transformId: string | null
   /** Palette mode: when set, the next floor click places this type. */
   placingType: ItemType | null
+  /** UI language for the whole editor. */
+  lang: Lang
 
   addItem: (type: ItemType, raw: Vec2) => void
   deleteItem: (id: string) => void
@@ -46,6 +48,7 @@ export interface EditorState {
   endTransform: () => void
   select: (id: string | null) => void
   setPlacingType: (type: ItemType | null) => void
+  setLang: (lang: Lang) => void
   undo: () => void
   redo: () => void
 }
@@ -57,6 +60,7 @@ export function createEditorStore() {
     nextSeq: initialNextSeq(),
     transformId: null,
     placingType: null,
+    lang: 'en',
 
     addItem: (type, raw) =>
       set((s) => {
@@ -188,6 +192,8 @@ export function createEditorStore() {
     select: (id) => set(() => ({ selectedId: id })),
 
     setPlacingType: (type) => set(() => ({ placingType: type })),
+
+    setLang: (lang) => set(() => ({ lang })),
 
     undo: () =>
       set((s) => {

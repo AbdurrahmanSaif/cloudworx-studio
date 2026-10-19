@@ -1,15 +1,19 @@
 import { Boxes } from 'lucide-react'
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { useI18n } from '../lib/i18n'
 import { editorStore, useEditorStore } from '../store/editorStore'
 import { Scene } from './editor/Scene'
+import { BomTable } from './ui/BomTable'
 import { ItemList } from './ui/ItemList'
+import { LangToggle } from './ui/LangToggle'
 import { Palette } from './ui/Palette'
 import { PropertiesPanel } from './ui/PropertiesPanel'
 import { RuleWarnings } from './ui/RuleWarnings'
 import { Toolbar } from './ui/Toolbar'
 
 export function AppLayout() {
+  const { t } = useI18n()
   const placingType = useEditorStore((s) => s.placingType)
 
   useEffect(() => {
@@ -31,14 +35,15 @@ export function AppLayout() {
           Cloudworx Studio
         </span>
         <Toolbar />
+        <LangToggle />
       </header>
 
       <div className="flex min-h-0 flex-1">
         <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900/60">
-          <Section title="Palette">
+          <Section title={t('section.palette')}>
             <Palette />
           </Section>
-          <Section title="Placed items" grow>
+          <Section title={t('section.items')} grow>
             <ItemList />
           </Section>
         </aside>
@@ -52,14 +57,14 @@ export function AppLayout() {
         </main>
 
         <aside className="flex w-80 shrink-0 flex-col border-l border-zinc-800 bg-zinc-900/60">
-          <Section title="Properties">
+          <Section title={t('section.props')}>
             <PropertiesPanel />
           </Section>
-          <Section title="Rule warnings" grow>
+          <Section title={t('section.rules')} grow>
             <RuleWarnings />
           </Section>
-          <Section title="Bill of materials" grow>
-            BOM table (milestone 6)
+          <Section title={t('section.bom')} grow>
+            <BomTable />
           </Section>
         </aside>
       </div>

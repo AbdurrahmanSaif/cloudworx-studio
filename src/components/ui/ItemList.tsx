@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
 import { EQUIPMENT } from '../../lib/catalog'
-import { itemDisplayName } from '../../lib/labels'
+import { useI18n } from '../../lib/i18n'
 import { collectViolationIds, findProximityViolations } from '../../lib/rules'
 import {
   selectItems,
@@ -10,6 +10,7 @@ import {
 } from '../../store/editorStore'
 
 export function ItemList() {
+  const { t, itemName } = useI18n()
   const items = useEditorStore(selectItems)
   const selectedId = useEditorStore(selectSelectedId)
   const select = useEditorStore((s) => s.select)
@@ -20,18 +21,14 @@ export function ItemList() {
   )
 
   if (items.length === 0) {
-    return (
-      <p className="leading-relaxed text-zinc-600">
-        Nothing placed yet. Pick a type in the palette, then click the floor.
-      </p>
-    )
+    return <p className="leading-relaxed text-zinc-600">{t('list.empty')}</p>
   }
 
   return (
     <ul className="flex flex-col gap-1">
       {items.map((item) => {
         const selected = item.id === selectedId
-        const name = itemDisplayName(item)
+        const name = itemName(item)
         return (
           <li key={item.id} className="flex items-center gap-1">
             <button
@@ -52,7 +49,7 @@ export function ItemList() {
               <span className="min-w-0 flex-1 truncate">{name}</span>
               {violatedIds.has(item.id) && (
                 <span
-                  aria-label="Clearance violation"
+                  aria-label={t('list.violationAria')}
                   className="h-2 w-2 shrink-0 rounded-full bg-red-500"
                 />
               )}
@@ -62,7 +59,7 @@ export function ItemList() {
             </button>
             <button
               type="button"
-              aria-label={`Delete ${name}`}
+              aria-label={`${t('toolbar.delete')}: ${name}`}
               onClick={() => deleteItem(item.id)}
               className="shrink-0 rounded border border-transparent p-1 text-zinc-600 transition-colors hover:border-red-900/60 hover:bg-red-950/60 hover:text-red-300"
             >

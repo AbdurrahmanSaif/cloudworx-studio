@@ -32,17 +32,17 @@ Then open the printed local URL (default `http://localhost:5173`) in a modern br
 
 ## Features
 
-Status: **Milestone 5 complete** — live proximity rule. Remaining milestones in progress.
+Status: **Milestone 6 complete** — bill of materials and language toggle. Only the benchmark milestone remains.
 
 - [x] Project scaffold, Tailwind, Vitest, base layout regions
-- [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (56 unit tests)
+- [x] Typed layout model, Zustand store with immutable edits, snapshot undo/redo (67 unit tests)
 - [x] Floor grid (20 m × 12 m, 0.5 m cells) and equipment palette (3 types: cabinet, motor, conveyor)
 - [x] Place equipment with grid snapping; select, move (drag), rotate (90°), delete
 - [x] Undo and redo for every edit (toolbar buttons; drags = one entry)
 - [x] Placed-items list and properties panel with two-way selection sync
 - [x] Live proximity rule (item centres < 0.6 m highlighted red in 3D, both names shown in warnings panel)
-- [ ] Bill of materials table derived from the scene
-- [ ] English / Vietnamese language toggle
+- [x] Bill of materials table derived from the scene (quantities per type + total)
+- [x] English / Vietnamese language toggle (typed dictionaries, every UI string switches)
 - [ ] README with measured 500-item benchmark
 
 ## Architecture Notes
@@ -54,6 +54,7 @@ Status: **Milestone 5 complete** — live proximity rule. Remaining milestones i
 - **Consistent placement:** every position change (add, drag, panel edit, rotation) goes through one entry point — snap to 0.5 m grid, then clamp the footprint inside the 20 × 12 m floor. Equipment footprints are defined in 1 m multiples so clamped positions always remain grid-aligned.
 - **Selection sync:** the list, properties panel, toolbar and 3D viewport all read/write the same `selectedId` in the store — selecting in any surface updates the others.
 - **Live rule:** violation detection runs as a memoised pure function over the item array on every layout change; the same violation ids drive the red 3D highlights, the red dots in the item list, and the warnings panel messages (both names + measured distance).
+- **Localisation:** English and Vietnamese live in one typed dictionary (`src/lib/i18n.ts`) — the Vietnamese record must cover every English key or TypeScript fails. The store holds the current `lang`; components get a bound translator via `useI18n()`. Equipment names in lists, warnings and the BOM are localised through the same keys.
 - **Component boundaries:** `src/components/editor/` holds R3F scene components; `src/components/ui/` holds DOM panels; `src/lib/i18n.ts` will hold EN/VI strings.
 
 ## Benchmark
@@ -65,6 +66,7 @@ _To be added after Milestone 7 with measured numbers (hardware, browser, FPS at 
 - Equipment uses simple three.js primitives (no external glTF models) per assessment guidance to spend time on editor behaviour.
 - Proximity rule measures centre-to-centre distance **on the ground plane (x/z)**: items rest on the floor, so this keeps the rule independent of item height and consistent across equipment types. O(n²) pairwise check — fine at the assessed scale (hundreds of items); revisit if scenes grow to thousands.
 - Selection (which item is active) is transient UI state and is **not** part of undo history: undoing a delete restores the item but does not re-select it.
+- Locale-sensitive number formatting is out of scope for the toggle: distances and coordinates render with Latin digits and a decimal point in both languages (machine-translated strings, per the assessment).
 - No backend, persistence, authentication, or collaboration (explicitly out of scope).
 
 ## AI Tooling

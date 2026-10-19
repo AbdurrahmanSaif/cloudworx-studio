@@ -1,7 +1,7 @@
 import { Archive, Cog, MoveHorizontal } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { EQUIPMENT, ITEM_TYPES } from '../../lib/catalog'
-import { typeLabel } from '../../lib/labels'
+import { useI18n } from '../../lib/i18n'
 import type { ItemType } from '../../types'
 import { useEditorStore } from '../../store/editorStore'
 
@@ -12,6 +12,7 @@ const TYPE_ICONS: Record<ItemType, LucideIcon> = {
 }
 
 export function Palette() {
+  const { t, typeLabel } = useI18n()
   const placingType = useEditorStore((s) => s.placingType)
   const setPlacingType = useEditorStore((s) => s.setPlacingType)
 
@@ -47,8 +48,8 @@ export function Palette() {
       })}
       <p className="text-[11px] leading-relaxed text-zinc-500">
         {placingType !== null
-          ? `Click the floor to place ${typeLabel(placingType)} — Esc to cancel.`
-          : 'Pick a type, then click the floor. Drag items to move them.'}
+          ? t('palette.hint.placing', { type: typeLabel(placingType) })
+          : t('palette.hint.pick')}
       </p>
     </div>
   )

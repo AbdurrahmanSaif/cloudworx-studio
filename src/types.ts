@@ -1,5 +1,7 @@
 export type ItemType = 'cabinet' | 'motor' | 'conveyor'
 
+export type Lang = 'en' | 'vi'
+
 export interface Vec2 {
   x: number
   z: number

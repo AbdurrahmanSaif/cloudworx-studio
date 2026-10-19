@@ -32,17 +32,20 @@ export interface EditorState {
   selectedId: string | null
   /** Session-scoped per-type name counters, outside the undo history. */
   nextSeq: Record<ItemType, number>
-  /** True while a pointer transform (drag) is in progress. */
-  transforming: boolean
+  /** Id of the item being dragged, or null when no transform is running. */
+  transformId: string | null
+  /** Palette mode: when set, the next floor click places this type. */
+  placingType: ItemType | null
 
   addItem: (type: ItemType, raw: Vec2) => void
   deleteItem: (id: string) => void
   rotateItem: (id: string) => void
   translateItem: (id: string, raw: Vec2) => void
-  beginTransform: () => void
+  beginTransform: (id: string) => void
   previewItemPosition: (id: string, raw: Vec2) => void
   endTransform: () => void
   select: (id: string | null) => void
+  setPlacingType: (type: ItemType | null) => void
   undo: () => void
   redo: () => void
 }
@@ -52,11 +55,12 @@ export function createEditorStore() {
     history: createHistory<LayoutItem[]>([]),
     selectedId: null,
     nextSeq: initialNextSeq(),
-    transforming: false,
+    transformId: null,
+    placingType: null,
 
     addItem: (type, raw) =>
       set((s) => {
-        if (s.transforming) return {}
+        if (s.transformId !== null) return {}
         const seq = s.nextSeq[type]
         const item: LayoutItem = {
           id: createId(),
@@ -74,7 +78,7 @@ export function createEditorStore() {
 
     deleteItem: (id) =>
       set((s) => {
-        if (s.transforming) return {}
+        if (s.transformId !== null) return {}
         const items = s.history.present
         if (!items.some((i) => i.id === id)) return {}
         return {
@@ -88,7 +92,7 @@ export function createEditorStore() {
 
     rotateItem: (id) =>
       set((s) => {
-        if (s.transforming) return {}
+        if (s.transformId !== null) return {}
         const items = s.history.present
         const index = items.findIndex((i) => i.id === id)
         if (index === -1) return {}
@@ -106,7 +110,7 @@ export function createEditorStore() {
 
     translateItem: (id, raw) =>
       set((s) => {
-        if (s.transforming) return {}
+        if (s.transformId !== null) return {}
         const items = s.history.present
         const index = items.findIndex((i) => i.id === id)
         if (index === -1) return {}
@@ -126,11 +130,11 @@ export function createEditorStore() {
         return { history: pushHistory(s.history, next) }
       }),
 
-    beginTransform: () =>
+    beginTransform: (id) =>
       set((s) => {
-        if (s.transforming) return {}
+        if (s.transformId !== null) return {}
         return {
-          transforming: true,
+          transformId: id,
           history: {
             ...s.history,
             past: [...s.history.past, s.history.present],
@@ -140,7 +144,7 @@ export function createEditorStore() {
 
     previewItemPosition: (id, raw) =>
       set((s) => {
-        if (!s.transforming) return {}
+        if (s.transformId !== id) return {}
         const items = s.history.present
         let changed = false
         const next = items.map((item) => {
@@ -164,28 +168,30 @@ export function createEditorStore() {
 
     endTransform: () =>
       set((s) => {
-        if (!s.transforming) return {}
+        if (s.transformId === null) return {}
         const { past, present, future } = s.history
         const last = past[past.length - 1]
         if (last === present) {
           // Nothing moved: drop the placeholder entry, keep the redo stack.
           return {
-            transforming: false,
+            transformId: null,
             history: { past: past.slice(0, -1), present, future },
           }
         }
         // Real change: the pre-drag snapshot stays in the past.
         return {
-          transforming: false,
+          transformId: null,
           history: { past, present, future: [] },
         }
       }),
 
     select: (id) => set(() => ({ selectedId: id })),
 
+    setPlacingType: (type) => set(() => ({ placingType: type })),
+
     undo: () =>
       set((s) => {
-        if (s.transforming) return {}
+        if (s.transformId !== null) return {}
         const history = undoHistory(s.history)
         if (history === s.history) return {}
         const selectedId =
@@ -197,7 +203,7 @@ export function createEditorStore() {
 
     redo: () =>
       set((s) => {
-        if (s.transforming) return {}
+        if (s.transformId !== null) return {}
         const history = redoHistory(s.history)
         if (history === s.history) return {}
         const selectedId =

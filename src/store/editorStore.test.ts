@@ -119,14 +119,14 @@ describe('transform (drag) session', () => {
     const id = items()[0].id
     const pastBefore = state().history.past.length
 
-    state().beginTransform()
+    state().beginTransform(id)
     state().previewItemPosition(id, { x: 1.2, z: 0.4 })
     state().previewItemPosition(id, { x: 2.4, z: 0.6 })
     state().endTransform()
 
     expect(items()[0].position).toEqual({ x: 2.5, z: 0.5 })
     expect(state().history.past).toHaveLength(pastBefore + 1)
-    expect(state().transforming).toBe(false)
+    expect(state().transformId).toBeNull()
     state().undo()
     expect(items()[0].position).toEqual({ x: 0, z: 0 })
   })
@@ -139,11 +139,11 @@ describe('transform (drag) session', () => {
     const id = items()[0].id
     const pastLength = state().history.past.length
 
-    state().beginTransform()
+    state().beginTransform(id)
     state().previewItemPosition(id, { x: 0.1, z: 0 }) // snaps back to 0,0
     state().endTransform()
 
-    expect(state().transforming).toBe(false)
+    expect(state().transformId).toBeNull()
     expect(state().history.past).toHaveLength(pastLength)
     expect(items()[0].position).toEqual({ x: 0, z: 0 })
     // The untouched drag must not wipe the redo stack.
@@ -159,13 +159,43 @@ describe('transform (drag) session', () => {
 
   it('blocks undo and redo while transforming', () => {
     state().addItem('cabinet', { x: 0, z: 0 })
-    state().beginTransform()
+    const id = items()[0].id
+    state().beginTransform(id)
+    expect(state().transformId).toBe(id)
     state().undo()
     expect(items()).toHaveLength(1)
     state().redo()
     expect(items()).toHaveLength(1)
-    expect(state().transforming).toBe(true)
+    expect(state().transformId).toBe(id)
     state().endTransform()
+    expect(state().transformId).toBeNull()
+  })
+
+  it('ignores a second transform while one is running', () => {
+    state().addItem('cabinet', { x: 0, z: 0 })
+    state().addItem('motor', { x: 5, z: 0 })
+    const [first, second] = items()
+    state().beginTransform(first.id)
+    state().beginTransform(second.id)
+    expect(state().transformId).toBe(first.id)
+    state().endTransform()
+  })
+})
+
+describe('placing mode', () => {
+  it('arms and disarms the palette type', () => {
+    expect(state().placingType).toBeNull()
+    state().setPlacingType('conveyor')
+    expect(state().placingType).toBe('conveyor')
+    state().setPlacingType(null)
+    expect(state().placingType).toBeNull()
+  })
+
+  it('keeps placing mode active after a placement', () => {
+    state().setPlacingType('cabinet')
+    state().addItem('cabinet', { x: 0, z: 0 })
+    expect(state().placingType).toBe('cabinet')
+    expect(items()).toHaveLength(1)
   })
 })
 

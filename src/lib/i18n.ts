@@ -6,7 +6,7 @@ const en = {
   'type.motor': 'Motor',
   'type.conveyor': 'Conveyor',
 
-  'section.palette': 'Palette',
+  'section.palette': 'Equipment',
   'section.items': 'Placed items',
   'section.props': 'Properties',
   'section.rules': 'Rule warnings',
@@ -19,16 +19,24 @@ const en = {
   'toolbar.placing': 'Placing: {type}',
   'toolbar.items.one': '{n} item',
   'toolbar.items.other': '{n} items',
+  'toolbar.group.history': 'History',
+  'toolbar.group.edit': 'Edit actions',
+
+  'viewport.floor': '20 × 12 m floor · 0.5 m grid',
+  'viewport.nav': 'Orbit: drag · Zoom: scroll · Pan: right-drag',
+  'viewport.placeHint': 'Click the floor to place · Esc to cancel',
 
   'palette.hint.pick': 'Pick a type, then click the floor. Drag items to move them.',
   'palette.hint.placing': 'Click the floor to place {type} — Esc to cancel.',
 
   'list.empty':
     'Nothing placed yet. Pick a type in the palette, then click the floor.',
+  'list.empty.title': 'No equipment placed',
   'list.violationAria': 'Clearance violation',
 
   'props.empty':
     'Select an item in the viewport or the list to edit its properties.',
+  'props.empty.title': 'Nothing selected',
   'props.name': 'Name',
   'props.posX': 'X (m)',
   'props.posZ': 'Z (m)',
@@ -41,6 +49,7 @@ const en = {
 
   'rules.empty':
     'No clearance violations. Any two items whose centres are closer than 0.6 m are highlighted in red and listed here.',
+  'rules.clear.title': 'Clearance check passed',
   'rules.count.one': '{n} violation',
   'rules.count.other': '{n} violations',
   'rules.detail': 'centres {d} m apart · limit 0.60 m · click to select',
@@ -60,7 +69,7 @@ const vi: Record<MessageKey, string> = {
   'type.motor': 'Động cơ',
   'type.conveyor': 'Băng chuyền',
 
-  'section.palette': 'Bộ chọn thiết bị',
+  'section.palette': 'Thiết bị',
   'section.items': 'Thiết bị đã đặt',
   'section.props': 'Thuộc tính',
   'section.rules': 'Cảnh báo quy tắc',
@@ -73,6 +82,12 @@ const vi: Record<MessageKey, string> = {
   'toolbar.placing': 'Đang đặt: {type}',
   'toolbar.items.one': '{n} thiết bị',
   'toolbar.items.other': '{n} thiết bị',
+  'toolbar.group.history': 'Lịch sử',
+  'toolbar.group.edit': 'Thao tác chỉnh sửa',
+
+  'viewport.floor': 'Sàn 20 × 12 m · lưới 0,5 m',
+  'viewport.nav': 'Xoay: kéo · Thu phóng: cuộn · Dời: kéo chuột phải',
+  'viewport.placeHint': 'Nhấp vào sàn để đặt · Esc để hủy',
 
   'palette.hint.pick':
     'Chọn một loại, rồi nhấp vào sàn để đặt. Kéo thiết bị để di chuyển.',
@@ -80,9 +95,11 @@ const vi: Record<MessageKey, string> = {
 
   'list.empty':
     'Chưa có thiết bị nào. Chọn loại ở bảng bên trái, rồi nhấp vào sàn.',
+  'list.empty.title': 'Chưa có thiết bị',
   'list.violationAria': 'Vi phạm khoảng cách',
 
   'props.empty': 'Chọn một thiết bị trong khung nhìn hoặc danh sách để chỉnh sửa.',
+  'props.empty.title': 'Chưa chọn thiết bị',
   'props.name': 'Tên',
   'props.posX': 'X (m)',
   'props.posZ': 'Z (m)',
@@ -95,6 +112,7 @@ const vi: Record<MessageKey, string> = {
 
   'rules.empty':
     'Không có vi phạm khoảng cách. Hai thiết bị có tâm cách nhau dưới 0,6 m sẽ được tô đỏ và liệt kê ở đây.',
+  'rules.clear.title': 'Kiểm tra khoảng cách đạt',
   'rules.count.one': '{n} vi phạm',
   'rules.count.other': '{n} vi phạm',
   'rules.detail': 'tâm cách nhau {d} m · giới hạn 0,60 m · nhấp để chọn',

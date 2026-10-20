@@ -130,15 +130,21 @@ export function Scene() {
   return (
     <Canvas
       dpr={[1, 1.5]}
-      camera={{ position: [15, 13, 17], fov: 45, near: 0.1, far: 300 }}
+      camera={{ position: [15.5, 12.5, 17.5], fov: 43, near: 0.1, far: 300 }}
       onPointerMissed={() => {
         const s = editorStore.getState()
         if (s.placingType === null) s.select(null)
       }}
     >
-      <color attach="background" args={['#09090b']} />
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[15, 25, 10]} intensity={1.2} />
+      <color attach="background" args={['#080b11']} />
+      <hemisphereLight args={['#9fb2cc', '#0a0d13', 0.5]} />
+      <ambientLight intensity={0.48} />
+      <directionalLight position={[14, 24, 10]} intensity={1.55} />
+      <directionalLight
+        position={[-12, 9, -14]}
+        intensity={0.38}
+        color="#7f93b3"
+      />
       <FloorGrid />
       <InteractionPlane />
       <ItemsLayer />

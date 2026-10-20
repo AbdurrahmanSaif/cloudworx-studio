@@ -1,4 +1,4 @@
-import { Redo2, RotateCw, Trash2, Undo2 } from 'lucide-react'
+import { Layers2, Redo2, RotateCw, Trash2, Undo2 } from 'lucide-react'
 import { useI18n } from '../../lib/i18n'
 import {
   selectCanRedo,
@@ -6,13 +6,6 @@ import {
   selectSelectedId,
   useEditorStore,
 } from '../../store/editorStore'
-
-const BTN =
-  'inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40'
-const NEUTRAL =
-  'border-zinc-700 bg-zinc-800 text-zinc-200 hover:border-zinc-500 enabled:hover:bg-zinc-700'
-const DANGER =
-  'border-red-900/60 bg-red-950/60 text-red-300 hover:border-red-700 enabled:hover:bg-red-900/40'
 
 export function Toolbar() {
   const { t, typeLabel } = useI18n()
@@ -29,51 +22,77 @@ export function Toolbar() {
   const hasSelection = selectedId !== null
 
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-2">
-      <button
-        type="button"
-        className={`${BTN} ${NEUTRAL}`}
-        disabled={!canUndo}
-        onClick={undo}
+    <div className="toolbar">
+      <div
+        className="tool-group"
+        role="group"
+        aria-label={t('toolbar.group.history')}
       >
-        <Undo2 className="h-3.5 w-3.5" aria-hidden="true" />
-        {t('toolbar.undo')}
-      </button>
-      <button
-        type="button"
-        className={`${BTN} ${NEUTRAL}`}
-        disabled={!canRedo}
-        onClick={redo}
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label={t('toolbar.undo')}
+          data-tooltip={t('toolbar.undo')}
+          disabled={!canUndo}
+          onClick={undo}
+        >
+          <Undo2 aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label={t('toolbar.redo')}
+          data-tooltip={t('toolbar.redo')}
+          disabled={!canRedo}
+          onClick={redo}
+        >
+          <Redo2 aria-hidden="true" />
+        </button>
+      </div>
+
+      <span className="toolbar-sep" aria-hidden="true" />
+
+      <div
+        className="tool-group"
+        role="group"
+        aria-label={t('toolbar.group.edit')}
       >
-        <Redo2 className="h-3.5 w-3.5" aria-hidden="true" />
-        {t('toolbar.redo')}
-      </button>
-      <span aria-hidden="true" className="mx-1 h-5 w-px bg-zinc-700" />
-      <button
-        type="button"
-        className={`${BTN} ${NEUTRAL}`}
-        disabled={!hasSelection}
-        onClick={() => selectedId && rotateItem(selectedId)}
-      >
-        <RotateCw className="h-3.5 w-3.5" aria-hidden="true" />
-        {t('toolbar.rotate')}
-      </button>
-      <button
-        type="button"
-        className={`${BTN} ${DANGER}`}
-        disabled={!hasSelection}
-        onClick={() => selectedId && deleteItem(selectedId)}
-      >
-        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-        {t('toolbar.delete')}
-      </button>
-      <div className="ml-auto flex items-center gap-3 text-xs text-zinc-500">
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label={t('toolbar.rotate')}
+          data-tooltip={t('toolbar.rotate')}
+          disabled={!hasSelection}
+          onClick={() => selectedId && rotateItem(selectedId)}
+        >
+          <RotateCw aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className="icon-btn icon-btn--danger"
+          aria-label={t('toolbar.delete')}
+          data-tooltip={t('toolbar.delete')}
+          disabled={!hasSelection}
+          onClick={() => selectedId && deleteItem(selectedId)}
+        >
+          <Trash2 aria-hidden="true" />
+        </button>
+      </div>
+
+      <div className="toolbar-status">
         {placingType !== null && (
-          <span className="text-amber-400">
+          <span className="placing-chip" role="status">
+            <span className="placing-chip__dot" aria-hidden="true" />
             {t('toolbar.placing', { type: typeLabel(placingType) })}
+            <kbd className="key-cap">Esc</kbd>
           </span>
         )}
-        <span>{t(count === 1 ? 'toolbar.items.one' : 'toolbar.items.other', { n: count })}</span>
+        <span className="scene-count">
+          <Layers2 aria-hidden="true" />
+          {t(count === 1 ? 'toolbar.items.one' : 'toolbar.items.other', {
+            n: count,
+          })}
+        </span>
       </div>
     </div>
   )

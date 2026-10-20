@@ -1,6 +1,5 @@
-import { X } from 'lucide-react'
+import { Boxes, TriangleAlert, X } from 'lucide-react'
 import { useMemo } from 'react'
-import { EQUIPMENT } from '../../lib/catalog'
 import { useI18n } from '../../lib/i18n'
 import { collectViolationIds, findProximityViolations } from '../../lib/rules'
 import {
@@ -8,6 +7,7 @@ import {
   selectSelectedId,
   useEditorStore,
 } from '../../store/editorStore'
+import { EquipmentGlyph } from './EquipmentGlyph'
 
 export function ItemList() {
   const { t, itemName } = useI18n()
@@ -21,50 +21,58 @@ export function ItemList() {
   )
 
   if (items.length === 0) {
-    return <p className="leading-relaxed text-zinc-600">{t('list.empty')}</p>
+    return (
+      <div className="empty-state">
+        <span className="empty-state__icon">
+          <Boxes aria-hidden="true" />
+        </span>
+        <span className="empty-state__title">{t('list.empty.title')}</span>
+        <p className="empty-state__text">{t('list.empty')}</p>
+      </div>
+    )
   }
 
   return (
-    <ul className="flex flex-col gap-1">
+    <ul className="item-list">
       {items.map((item) => {
         const selected = item.id === selectedId
         const name = itemName(item)
         return (
-          <li key={item.id} className="flex items-center gap-1">
+          <li
+            key={item.id}
+            className={`item-row ${selected ? 'is-selected' : ''}`}
+          >
             <button
               type="button"
               aria-pressed={selected}
               onClick={() => select(item.id)}
-              className={`flex min-w-0 flex-1 items-center gap-2 rounded-md border px-2 py-1.5 text-left text-xs transition-colors ${
-                selected
-                  ? 'border-amber-500/70 bg-amber-500/10 text-amber-100'
-                  : 'border-transparent bg-zinc-800/30 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/60'
-              }`}
+              className="item-select"
             >
-              <span
-                aria-hidden="true"
-                className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                style={{ backgroundColor: EQUIPMENT[item.type].color }}
-              />
-              <span className="min-w-0 flex-1 truncate">{name}</span>
+              <EquipmentGlyph type={item.type} size="sm" />
+              <span className="item-main">
+                <span className="item-name">{name}</span>
+                <span className="item-meta">
+                  X {item.position.x.toFixed(1)} · Z{' '}
+                  {item.position.z.toFixed(1)}
+                </span>
+              </span>
               {violatedIds.has(item.id) && (
-                <span
+                <TriangleAlert
                   aria-label={t('list.violationAria')}
-                  className="h-2 w-2 shrink-0 rounded-full bg-red-500"
+                  className="item-violation"
                 />
               )}
-              <span className="shrink-0 text-[10px] tabular-nums text-zinc-500">
-                {item.position.x.toFixed(1)}, {item.position.z.toFixed(1)}
-              </span>
             </button>
-            <button
-              type="button"
-              aria-label={`${t('toolbar.delete')}: ${name}`}
-              onClick={() => deleteItem(item.id)}
-              className="shrink-0 rounded border border-transparent p-1 text-zinc-600 transition-colors hover:border-red-900/60 hover:bg-red-950/60 hover:text-red-300"
-            >
-              <X className="h-3 w-3" aria-hidden="true" />
-            </button>
+            <div className="item-actions">
+              <button
+                type="button"
+                aria-label={`${t('toolbar.delete')}: ${name}`}
+                onClick={() => deleteItem(item.id)}
+                className="item-remove"
+              >
+                <X aria-hidden="true" />
+              </button>
+            </div>
           </li>
         )
       })}

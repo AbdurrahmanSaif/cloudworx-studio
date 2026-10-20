@@ -1,3 +1,4 @@
+import { Edges } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
 import { BoxGeometry, CylinderGeometry, MathUtils } from 'three'
 import type { BufferGeometry } from 'three'
@@ -33,6 +34,7 @@ export function EquipmentItem({
   const def = EQUIPMENT[item.type]
   const ringRadius =
     Math.max(def.footprint.width, def.footprint.depth) / 2 + 0.2
+  const markerColor = violated ? '#ef4444' : '#fbbf24'
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     const s = editorStore.getState()
@@ -58,17 +60,31 @@ export function EquipmentItem({
         onPointerDown={handlePointerDown}
       >
         <meshStandardMaterial
-          color={violated ? '#ef4444' : selected ? '#fbbf24' : def.color}
+          color={violated ? '#ef4444' : def.color}
           emissive={violated ? '#dc2626' : selected ? '#f59e0b' : '#000000'}
-          emissiveIntensity={violated ? 0.55 : selected ? 0.5 : 0}
-          roughness={0.6}
-          metalness={0.15}
+          emissiveIntensity={violated ? 0.38 : selected ? 0.22 : 0}
+          roughness={0.52}
+          metalness={0.28}
         />
+        {selected && (
+          <Edges
+            scale={1.002}
+            threshold={24}
+            color={markerColor}
+          />
+        )}
       </mesh>
+
       {(selected || violated) && (
         <mesh rotation-x={-Math.PI / 2} position-y={0.02}>
-          <ringGeometry args={[ringRadius - 0.08, ringRadius, 48]} />
-          <meshBasicMaterial color={violated ? '#ef4444' : '#fbbf24'} />
+          <ringGeometry args={[ringRadius - 0.05, ringRadius, 56]} />
+          <meshBasicMaterial
+            color={markerColor}
+            transparent
+            opacity={0.92}
+            depthWrite={false}
+            toneMapped={false}
+          />
         </mesh>
       )}
     </group>

@@ -75,12 +75,13 @@ export function DevBenchmarkBar() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+    <div className="bench-bar">
+      <span className="bench-label">DEV</span>
       <button
         type="button"
         onClick={seed}
         disabled={measuring}
-        className="rounded border border-zinc-700 px-2 py-1 transition-colors hover:border-zinc-500 hover:text-zinc-200 disabled:opacity-40"
+        className="bench-btn"
       >
         Seed {SEED_COUNT}
       </button>
@@ -88,19 +89,18 @@ export function DevBenchmarkBar() {
         type="button"
         onClick={() => void run()}
         disabled={measuring}
-        className="rounded border border-zinc-700 px-2 py-1 transition-colors hover:border-zinc-500 hover:text-zinc-200 disabled:opacity-40"
+        className="bench-btn"
       >
         {measuring ? 'Measuring…' : `Measure ${MEASURE_DURATION_MS / 1000}s`}
       </button>
-      <span className="tabular-nums" title="Live frames per second">
-        {liveFps} fps
+      <span className="bench-metric" title="Live frames per second">
+        <span className="bench-metric__dot" aria-hidden="true" />
+        {liveFps} FPS
       </span>
       {result && (
-        <span className="hidden tabular-nums text-zinc-500 xl:inline">
-          {formatBenchSummary(result)}
-        </span>
+        <span className="bench-summary">{formatBenchSummary(result)}</span>
       )}
-      <span className="tabular-nums text-zinc-600" title="Items in the scene">
+      <span className="bench-metric bench-metric--muted" title="Items in the scene">
         {itemCount} items
       </span>
     </div>

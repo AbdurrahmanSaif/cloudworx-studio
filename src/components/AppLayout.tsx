@@ -1,98 +1,213 @@
-import { Boxes } from "lucide-react";
-import { useEffect } from "react";
-import type { ReactNode } from "react";
-import { useI18n } from "../lib/i18n";
-import { editorStore, useEditorStore } from "../store/editorStore";
-import { DevBenchmarkBar } from "../dev/DevBenchmarkBar";
-import { Scene } from "./editor/Scene";
-import { BomTable } from "./ui/BomTable";
-import { ItemList } from "./ui/ItemList";
-import { LangToggle } from "./ui/LangToggle";
-import { Palette } from "./ui/Palette";
-import { PropertiesPanel } from "./ui/PropertiesPanel";
-import { RuleWarnings } from "./ui/RuleWarnings";
-import { Toolbar } from "./ui/Toolbar";
+import {
+  Boxes,
+  Grid3x3,
+  Mouse,
+  MousePointerClick,
+  PanelLeft,
+  PanelRight,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+import { useI18n } from '../lib/i18n'
+import { editorStore, useEditorStore } from '../store/editorStore'
+import { DevBenchmarkBar } from '../dev/DevBenchmarkBar'
+import { Scene } from './editor/Scene'
+import { BomTable } from './ui/BomTable'
+import { ItemList } from './ui/ItemList'
+import { LangToggle } from './ui/LangToggle'
+import { Palette } from './ui/Palette'
+import { PropertiesPanel } from './ui/PropertiesPanel'
+import { RuleWarnings } from './ui/RuleWarnings'
+import { Toolbar } from './ui/Toolbar'
+
+type OpenPanel = 'left' | 'right' | null
 
 export function AppLayout() {
-  const { t } = useI18n();
-  const placingType = useEditorStore((s) => s.placingType);
+  const { t, typeLabel } = useI18n()
+  const placingType = useEditorStore((s) => s.placingType)
+  const itemCount = useEditorStore((s) => s.history.present.length)
+  const [openPanel, setOpenPanel] = useState<OpenPanel>(null)
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      const s = editorStore.getState();
-      if (s.placingType !== null) s.setPlacingType(null);
-      else s.select(null);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+      if (e.key !== 'Escape') return
+      const s = editorStore.getState()
+      if (s.placingType !== null) s.setPlacingType(null)
+      else s.select(null)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  const togglePanel = (panel: Exclude<OpenPanel, null>) => {
+    setOpenPanel((current) => (current === panel ? null : panel))
+  }
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex h-12 shrink-0 items-center gap-4 border-b border-zinc-800 bg-zinc-900 px-3">
-        <span className="flex shrink-0 items-center gap-2 text-sm font-semibold tracking-wide text-zinc-100">
-          <Boxes className="h-4 w-4 text-amber-500" aria-hidden="true" />
-          Cloudworx Studio
-        </span>
+    <div className="app-shell">
+      <header className="topbar">
+        <div className="brand">
+          <span className="brand-mark" aria-hidden="true">
+            <Boxes />
+          </span>
+          <span className="brand-text">
+            <span className="brand-name">
+              Cloudworx <em>Studio</em>
+            </span>
+            <span className="brand-sub">Industrial Layout</span>
+          </span>
+        </div>
+
         <Toolbar />
-        <LangToggle />
-        {import.meta.env.DEV && <DevBenchmarkBar />}
+
+        <div className="mobile-panel-toggles">
+          <button
+            type="button"
+            className={`icon-btn ${openPanel === 'left' ? 'is-active' : ''}`}
+            aria-label={t('section.palette')}
+            aria-controls="equipment-panel"
+            aria-expanded={openPanel === 'left'}
+            data-tooltip={t('section.palette')}
+            onClick={() => togglePanel('left')}
+          >
+            <PanelLeft aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={`icon-btn ${openPanel === 'right' ? 'is-active' : ''}`}
+            aria-label={t('section.props')}
+            aria-controls="inspector-panel"
+            aria-expanded={openPanel === 'right'}
+            data-tooltip={t('section.props')}
+            onClick={() => togglePanel('right')}
+          >
+            <PanelRight aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="topbar-actions">
+          <LangToggle />
+          {import.meta.env.DEV && (
+            <div className="bench-shell">
+              <DevBenchmarkBar />
+            </div>
+          )}
+        </div>
       </header>
 
-      <div className="flex min-h-0 flex-1">
-        <aside className="flex w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900/60">
-          <Section title={t("section.palette")}>
-            <Palette />
+      <div className="app-body">
+        <aside
+          id="equipment-panel"
+          className={`sidebar sidebar-left ${openPanel === 'left' ? 'is-open' : ''}`}
+          aria-label={t('section.palette')}
+        >
+          <Section title={t('section.palette')}>
+            <div onClick={() => setOpenPanel(null)}>
+              <Palette />
+            </div>
           </Section>
-          <Section title={t("section.items")} grow>
+          <Section
+            title={t('section.items')}
+            count={itemCount}
+            grow
+            scroll
+          >
             <ItemList />
           </Section>
         </aside>
 
         <main
-          className={`relative min-w-0 flex-1 bg-zinc-950 ${
-            placingType !== null ? "cursor-crosshair" : ""
-          }`}
+          className={`viewport-shell ${placingType !== null ? 'is-placing' : ''}`}
         >
           <Scene />
+          <div className="viewport-overlay">
+            <div className="viewport-topline">
+              <div className="viewport-chips">
+                <span className="viewport-chip">
+                  <Grid3x3 aria-hidden="true" />
+                  {t('viewport.floor')}
+                </span>
+              </div>
+              <div className="viewport-chips" />
+            </div>
+
+            <div className="viewport-bottomline">
+              <span className="viewport-nav-hint">
+                <Mouse aria-hidden="true" />
+                {t('viewport.nav')}
+              </span>
+              <div className="viewport-hint-slot">
+                {placingType !== null && (
+                  <div className="viewport-place-hint" role="status">
+                    <MousePointerClick aria-hidden="true" />
+                    <span>
+                      <strong>{t('toolbar.placing', {
+                        type: typeLabel(placingType),
+                      })}</strong>
+                      <span className="hint-sep">·</span>
+                      {t('viewport.placeHint')}
+                    </span>
+                    <kbd className="key-cap">Esc</kbd>
+                  </div>
+                )}
+              </div>
+              <span className="viewport-bottom-spacer" aria-hidden="true" />
+            </div>
+          </div>
         </main>
 
-        <aside className="flex w-80 shrink-0 flex-col border-l border-zinc-800 bg-zinc-900/60">
-          <Section title={t("section.props")}>
+        <aside
+          id="inspector-panel"
+          className={`sidebar sidebar-right ${openPanel === 'right' ? 'is-open' : ''}`}
+          aria-label={t('section.props')}
+        >
+          <Section title={t('section.props')}>
             <PropertiesPanel />
           </Section>
-          <Section title={t("section.rules")} grow>
+          <Section title={t('section.rules')} grow scroll>
             <RuleWarnings />
           </Section>
-          <Section title={t("section.bom")} grow>
+          <Section title={t('section.bom')} count={itemCount}>
             <BomTable />
           </Section>
         </aside>
+
+        <div
+          className={`sidebar-backdrop ${openPanel !== null ? 'is-visible' : ''}`}
+          aria-hidden="true"
+          onClick={() => setOpenPanel(null)}
+        />
       </div>
     </div>
-  );
+  )
 }
 
 function Section({
   title,
+  count,
   grow = false,
+  scroll = false,
   children,
 }: {
-  title: string;
-  grow?: boolean;
-  children: ReactNode;
+  title: string
+  count?: number
+  grow?: boolean
+  scroll?: boolean
+  children: ReactNode
 }) {
   return (
     <section
-      className={`flex min-h-0 flex-col ${grow ? "flex-1" : "shrink-0"}`}
+      className={`panel-section ${grow ? 'panel-section--grow' : ''}`}
     >
-      <h2 className="border-b border-zinc-800 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-        {title}
-      </h2>
-      <div className="min-h-0 flex-1 overflow-auto p-3 text-xs text-zinc-600">
+      <div className="panel-head">
+        <h2 className="panel-title">{title}</h2>
+        {count !== undefined && (
+          <span className="panel-count">{count}</span>
+        )}
+      </div>
+      <div className={`panel-body ${scroll ? 'panel-body--scroll' : ''}`}>
         {children}
       </div>
     </section>
-  );
+  )
 }
